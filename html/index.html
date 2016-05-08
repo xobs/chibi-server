@@ -15,6 +15,53 @@
         request.send(null);
         window.setTimeout(pingServer, 5000);
     }
+
+    /* Make random ID.  Taken from http://stackoverflow.com/questions/1349404/generate-a-string-of-5-random-characters-in-javascript */
+    function makeId() {
+      var text = "";
+      var possible = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
+
+      for (var i = 0; i < 10; i++)
+        text += possible.charAt(Math.floor(Math.random() * possible.length));
+
+      return text;
+    }
+
+    /* Idea adapted from http://stackoverflow.com/questions/4079280/javascript-communication-between-browser-tabs-windows */
+    function getId() {
+      var cname = "cookie-latest-id=";
+      var set_cookies = document.cookie.split(";");
+
+      for (var i = 0; i < set_cookies.length; i++) {
+        var coo = set_cookies[i];
+
+        /* Fast-forward to the content, skipping e.g. "; " between cookies. */
+        while (coo.charAt(0) == ' ')
+          coo = coo.substring(1, coo.length);
+
+        /* If the name matches, return the value (minus the prefix) */
+        if (coo.indexOf(cname) == 0)
+          return coo.substring(cname.length, coo.length);
+      }
+      return null;
+    }
+
+    function closeIfIdChanged(id) {
+      if (id != getId())
+        window.close();
+      else
+        window.setTimeout(closeIfIdChanged, 500, id);
+    }
+
+    /* Sets a cookie that causes other listeners to close.
+     * Closes this window if the cookie changes.
+     */
+    function closeOtherProgrammers() {
+      var id = makeId();
+      document.cookie = "cookie-latest-id=" + id + "; path=/";
+      closeIfIdChanged(id);
+    }
+
     function sendFile() {
       ui.startSending();
     }
@@ -34,7 +81,8 @@
         /* Start pinging as soon as the page is loaded */
         document.addEventListener("DOMContentLoaded", function(event) {
           pingServer();
-	        ui.init("/file.bin");
+          closeOtherProgrammers();
+          ui.init("/file.bin");
         });
       </script>
   </body>
