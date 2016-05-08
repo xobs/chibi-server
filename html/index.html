@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="UTF-8">
+    <script src="modulate-ui.js"></script>
+    <script src="modulate.js"></script>
+    <script src="murmurhash3_gc.js"></script>
+    <script src="afsk-encoder.js"></script>
+    <script src="spark-md5.js"></script>
+    <script type="text/javascript" charset="utf-8">
+    /* Call /ping to let the server know we're still here */
+    function pingServer() {
+        var request = new XMLHttpRequest();
+        request.open("GET", "/ping");
+        request.send(null);
+        window.setTimeout(pingServer, 5000);
+    }
+    function sendFile() {
+      ui.startSending();
+    }
+    function stopSending() {
+      ui.stopSending();
+    }
+    </script>
+  </head>
+  <body>
+      Chibitronics test data generator!
+      <a href="#" onclick="javascript:sendFile(); false" id=file class=button>  Send File </a>
+      <a href="#" onclick="javascript:stopSending(); false" id=file class=button>  Stop </a>
+      <div id=wavStripContainer style="overflow: scroll;">
+	       <canvas id=wavStrip width=6000 height=100 style="border: 1px solid #ddd; background: black"></canvas>
+      </div>
+      <script type="text/javascript" charset="utf-8">
+        /* Start pinging as soon as the page is loaded */
+        document.addEventListener("DOMContentLoaded", function(event) {
+          pingServer();
+	        ui.init("/file.bin");
+        });
+      </script>
+  </body>
+</html>
